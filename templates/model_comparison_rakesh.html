@@ -1,0 +1,207 @@
+{% extends "layout.html" %}
+
+	{% block content %}
+		<div class="adminx-main-content">
+					
+			<div class="row" id="inputrow">
+				<div class="col-lg-8">
+					<div class="card mb-grid">
+						<div class="card-header">
+							<div class="card-header-title">Select Comparison Parameters</div>
+						</div>
+						<div class="card-body">
+						
+							<div class="form-group row">
+								<label for="model_list" class="col-sm-4 col-form-label form-label">Model</label>
+								
+								<div class="col-sm-8">
+									<select name="model_list_to_select" id="model_list" class="form-control js-example-basic-single">
+										<option> </option>
+										<option> All </option>
+										{% for m in model_list %}
+											<option value= "{{m}}" > {{m}} </option>
+										{% endfor %}
+									</select>											
+								</div>								
+							</div>												
+
+							<div class="form-group row">
+								<label for="model_run_type" class="col-sm-4 col-form-label form-label">Model Run</label>
+								<div class="col-sm-8">
+									<select name="model_run_type" id="model_run_type" class="form-control js-example-basic-single">
+									<option> </option>
+										{% for model_run in model_run_type %}
+											<option value= "{{model_run }}" > {{model_run }} </option>
+										{% endfor %}
+									</select>								  
+								</div>								
+							</div>	
+
+							<div class="form-group row">
+								<label for="submit_button" class="col-sm-4 col-form-label form-label"></label>
+								<div class="col-sm-8">
+									<button type="submit" class="btn btn-sm btn-primary" id = "submit_button">Submit</button>								  
+								</div>								
+							</div>	
+
+						</div>
+					</div>
+				</div>
+
+			</div>
+					
+			<hr>
+			
+			<div class="row" id="output_row_tables" style="display:none">
+			    <div class="col-lg-12 ">
+					<div class="card mb-grid">
+						<div class="card-body d-flex flex-column">					
+							<div class="card">
+								<div class="card-header d-flex justify-content-between align-items-center">
+									<div class="card-header-title">Model Metrics</div>
+									  
+									  <div class="dropdown">
+										<a class="card-header-action" href="#" role="button" id="card1Settings" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+										  <i data-feather="plus-square"></i>
+										</a>
+
+										<div class="dropdown-menu dropdown-menu-right" aria-labelledby="card1Settings">
+										  <a class="dropdown-item" onclick = "exportTableToExcel('model_output_table', 'model')" href="#">Export to Excel</a>
+										</div>
+									  </div>
+
+									</nav>
+								</div>
+							  
+							  <div class="card-body collapse show" id="card1" style="height:300px;overflow-y:auto; overflow-x:auto">
+									<table id="model_output_table" class="table table-actions table-striped table-hover mb-0">
+									</table>
+							  </div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+
+	{% endblock content %}
+
+	{% block popup_divs %}
+		
+	{% endblock popup_divs %}
+	
+
+	{% block my_scripts %}
+
+<script>
+	$(document).ready(function () {
+		$('#model_list').select2({
+			placeholder: "Select Model",
+			allowClear: true
+		});
+		});
+
+	$(document).ready(function () {
+		$('#model_run_type').select2({
+			placeholder: "Select Comparison Type",
+			allowClear: true
+		});
+		});
+</script>
+	
+	<script type=text/javascript>
+		  $(function() 
+		  {
+			$('#submit_button').bind('click', function() 
+			{
+				$.getJSON('/get_model_comparison', 
+				{				
+					model : $('select[name="model_list_to_select"]').val(),
+					model_run_type: $('select[id="model_run_type"]').val(),
+				}, function(data) {
+			
+					$('#output_row_tables').css({'display':'-webkit-box','display':'-ms-flexbox','display':'flex'})
+						$('#model_output_table').empty();
+						$('#model_output_table').append('<tr>');
+						$('#model_output_table').append('<th>Model</th>');
+						$('#model_output_table').append('<th>Model Run Datetime</th>');
+						$('#model_output_table').append('<th>Model Execution Duration</th>');
+						$('#model_output_table').append('<th>True Negative</th>');
+						$('#model_output_table').append('<th>True Positive</th>');
+						$('#model_output_table').append('<th>False Positive</th>');
+						$('#model_output_table').append('<th>False Negative</th>');
+						$('#model_output_table').append('<th>Sensitivity</th>');
+						$('#model_output_table').append('<th>Specificity</th>');
+						$('#model_output_table').append('<th>Precision</th>');
+						$('#model_output_table').append('<th>Accuracy</th>');
+						$('#model_output_table').append('<th>Train File</th>');												
+						$('#model_output_table').append('<th>Test File</th>');
+						$('#model_output_table').append('<th>Model Parameters</th>');
+						$('#model_output_table').append('</tr>');
+						console.log("Inside Print");
+						console.log(data);				
+						console.log(data.length);
+						
+						for (var i=0, len=data.length; i<len;i++) 
+						{
+								$('#model_output_table').append('<tr>');
+								$('#model_output_table').append('<td>' + data[i]['model_used'] + '</td>');
+								$('#model_output_table').append('<td>' + data[i]['model_result']['run_datetime']+ '</td>');
+								$('#model_output_table').append('<td>' + data[i]['model_result']['time_taken']+ '</td>');
+								$('#model_output_table').append('<td>' + data[i]['model_result']['true_negative'] + '</td>');
+								$('#model_output_table').append('<td>' + data[i]['model_result']['true_positive'] + '</td>');
+								$('#model_output_table').append('<td>' + data[i]['model_result']['false_positive'] + '</td>');
+								$('#model_output_table').append('<td>' + data[i]['model_result']['false_negative'] + '</td>');
+								$('#model_output_table').append('<td>' + data[i]['model_result']['sensitivity'] + '</td>');
+								$('#model_output_table').append('<td>' + data[i]['model_result']['specificity'] + '</td>');
+								$('#model_output_table').append('<td>' + data[i]['model_result']['precision'] + '</td>');
+								$('#model_output_table').append('<td>' + data[i]['model_result']['accuracy'] + '</td>');
+								$('#model_output_table').append('<td>' + data[i]['train_file'] + '</td>');
+								$('#model_output_table').append('<td>' + data[i]['test_file'] + '</td>');
+								$('#model_output_table').append('<td>' + JSON.stringify(data[i]['model_parameters'] )+ '</td>');
+						}
+			  });
+			  return false;
+			  
+			}
+			);
+		  });
+	</script>
+
+	<script>
+
+
+function exportTableToExcel(tableID, filename = ''){
+    var downloadLink;
+    var dataType = 'application/vnd.ms-excel';
+    var tableSelect = document.getElementById(tableID);
+    var tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
+    
+    // Specify file name
+    filename = filename?filename+'.xls':'excel_data.xls';
+    
+    // Create download link element
+    downloadLink = document.createElement("a");
+    
+    document.body.appendChild(downloadLink);
+    
+    if(navigator.msSaveOrOpenBlob){
+        var blob = new Blob(['\ufeff', tableHTML], {
+            type: dataType
+        });
+        navigator.msSaveOrOpenBlob( blob, filename);
+    }else{
+        // Create a link to the file
+        downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
+    
+        // Setting the file name
+        downloadLink.download = filename;
+        
+        //triggering the function
+        downloadLink.click();
+    }
+}
+	
+	</script>	
+	{% endblock my_scripts %}	

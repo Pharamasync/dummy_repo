@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/bootstrap.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/login.css') }}">
+  <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery-3.4.1.min.js') }}"></script>
+  <title>Money Laundering Transaction Monitoring</title>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="wrapper fadeInDown">
+  <div id="formContent">
+    <!-- Tabs Titles -->
+
+    <!-- Icon -->
+    <div class="fadeIn first">
+      <img src="{{ url_for('static', filename='ppe.png') }}" id="icon" alt="User Icon" height='100px' width = '200px'/>
+    </div>
+	
+	<div id="alert_wrapper" style="visibility:{{msg}}; color:green">
+	<span>{{ message }}</span></div>
+		  
+		  <div id="alert_wrapper" style="visibility:{{err}}; color:red">
+		<span>Invalid credentials</span></div>
+
+    <!-- Login Form -->
+    <form action = "/login" method = "POST">
+      <input type="text" id="login" class="fadeIn second" name="login" placeholder="User ID">
+      <input type="password" id="password" class="fadeIn third" name="password" placeholder="Password">
+	  <select id="role" class="fadeIn fourth" name="role">
+		<option value="admin">Admin</option>
+		<option value="analyst">Analyst</option>
+	  </select>
+      <input type="submit" class="fadeIn fifth" value="Log In">
+    </form>
+
+  
+
+  </div>
+</div>
+  </div>
+
+  <!-- Import Bootstrap JavaScript here -->
+
+</body>
+
+</html>

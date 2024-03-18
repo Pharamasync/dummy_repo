@@ -1,0 +1,462 @@
+{% extends "layout.html" %}
+
+
+	{% block content %}
+		<div class="adminx-main-content" >
+           <div class="row" id="inputrow">
+				<div class="col-lg-6">
+					<div class="card mb-grid">
+						<div class="card-header" style="background-color:#5397d3">
+							<div class="card-header-title"><font color='white'><font color='white'>New Dataset</font></font></div>
+						</div>
+						<div class="card-body" style="background-color:#9acfff">
+							<form method="POST" enctype="multipart/form-data" id="upload_form" action="{{ url_for('upload') }}">
+								<div class="form-group row">
+									<label for="model_list" class="col-sm-4 col-form-label form-label">Select File</label>
+									<div class="col-sm-8">
+										<input class="btn" id="file-picker" type="file" name="file">
+										    <fieldset id="progress" style="display: none">
+												<legend>Files Progress</legend>
+
+												<div class="progress-trough">
+													<div id="progress-bar" class="progress-bar">0%</div>
+												</div>
+											</fieldset>
+									</div>
+									
+								</div>
+								<div class="form-group row">
+									
+									<input type="submit" style ="margin-left:40%" value = "Upload" class="btn btn-primary" id = "upload-button">								
+								</div>
+								<div class="form-group row">
+								<input type="text" value = {{filename}} class="btn btn-primary" id = "fileNameHidden" style="display:none">
+								{% if msg  %}
+										<label for="model_list" class="col-lg-10 " style="margin-left:15%"><font color={{color}}><b>{{msg}}</b></font></label>
+										
+									{% endif %}	
+								</div>
+								{% if split =='N' %} 
+
+									<div class="form-group row" >
+										<div class="col-sm-8">
+											<input type="button" style ="margin-left:63%" value = "Info" class="btn btn-primary" id = "info-button">
+											
+										</div>
+									</div>
+								{% endif %}								
+							</form>
+				
+							
+						</div>
+					</div>
+				</div>
+				{% if split =='Y' %} 
+				<div class="col-lg-6" >
+					<div class="card mb-grid">
+						<div class="card-header" style="background-color:#5397d3">
+							<div class="card-header-title"><font color='white'>TRAIN TEST RATIO</font></div>
+						</div>
+						<div class="card-body" style="background-color:#9acfff">
+							
+								<div class="form-group row slidecontainer" >
+								
+									<div class="col-sm-1">
+										<span>0</span> 
+									</div>
+									<div class="col-sm-8">
+										<input type="range" for='split' min="0" max="100" value="70" step="10" class="slider" id="myRange" onchange="updateTestTrain();">
+									</div>
+									<div class="col-sm-2">
+										<span>100</span> 
+									</div>
+								</div>	
+								<div class="row">
+									<div class="col-sm-3">
+										<b><span>Train : </span><span id="train_value" >70</span></b>
+									</div>
+									<div class="col-sm-3">
+										<b><span>Test : </span><span id="test_value" >30</span></b>
+									</div>
+								</div>
+								<div class="row" style="padding-bottom: 53px;padding-top:10px;">
+									<div class="col-sm-10">
+										<input type="button" onClick="generateTestTrainSplit()" value = "Split" class="btn btn-primary" id = "split_button" style="margin-left :50%" >
+									</div>
+								</div>
+						</div>
+					</div>
+				</div>
+				{% endif %}
+			</div>
+           <div class="row" id="inputrow" style='display:none'>
+				<div class="col-lg-6">
+					<div class="card mb-grid">
+						<div class="card-header" style="background-color:#5397d3">
+							<div class="card-header-title"><font color='white'><font color='white'>New Dataset</font></font></div>
+						</div>
+						<div class="card-body" style="background-color:#9acfff">
+						  <div class="form-group mb-3">
+							<div class="custom-file">
+							  <input type="file" class="custom-file-input" name="file_input" id="file_input" oninput="input_filename();">
+							  <label id="file_input_label" class="custom-file-label" for="file_input">Select file to upload</label>
+							  
+							</div>
+						  </div>							
+						  <button onclick="upload('{{ upload }}');" style ="margin-left:40%" id="upload_btn" class="btn btn-primary">Upload</button>						
+							<button class="btn btn-primary d-none" style ="margin-left:40%" id="loading_btn" type="button" disabled>
+							  <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+							    Uploading...
+						    </button>							
+						</div>
+					</div>
+				</div>
+
+			</div>			
+           <div class="row" id="target_variable" style='display:none'>
+				<div class="col-lg-6">
+					<div class="card mb-grid">
+						<div class="card-header" style="background-color:#5397d3">
+							<div class="card-header-title"><font color='white'><font color='white'>Select Dependent Variables</font></font></div>
+						</div>
+						<div class="card-body" style="background-color:#9acfff">
+							<div class="form-group row">
+								<label for="file_selected" class="col-sm-4 col-form-label form-label">Target Variable</label>
+								<div class="col-sm-8">
+									<select name="files" style="width:300px;" id="target_field" class="form-control js-example-basic-single">
+									<option> </option>
+									</select>								  
+								</div>								
+							</div>
+							<button type="button" style= "margin-left :40%"  class="btn btn-primary btn-sm" id = "run_button" onclick="getSummary();">Get Summary</button>	
+				
+							
+						</div>
+					</div>
+				</div>
+			</div>
+		<div class="row" id="summary_details" style="display:none">
+			<div class="col-lg-7 d-flex">
+				<div class="card mb-grid w-100" style="background-color: rgba(102, 0, 0, .35);">
+					<div class="card-body d-flex flex-column">					
+						<div class="card">
+							<div class="card-header d-flex justify-content-between align-items-center" style="background-color: rgb(102, 0, 0);">
+								<div class="card-header-title"><font color='white'>SUMMARY DETAILS</font></div>
+							</div>
+						  
+							<div class="card-body collapse show" id="card_summary" style="height:300px;">
+								<div class="form-group row">	
+									<table id="summary_table" class="table table-actions table-bordered table-hover mb-0">
+										<tr>
+											<th style="text-align:center;"> Train File</th>
+											<th style="text-align:center;"> Test File</th>
+										</tr>
+										<tr>
+											<td style="text-align:left;">
+												<img src="static/medical.jpeg" class="navbar-brand-image d-inline-block align-top mr-2 " alt=""><input type="text"  id="train_count" style="font-size:20px;background-color: rgba(102, 0, 0, .35);color:white;" value ="Counts : "/>
+											</td>
+											<td style="text-align:left;">
+												<img src="static/medical.jpeg" class="navbar-brand-image d-inline-block align-top mr-2 " alt=""><input type="text"  id="test_count" style="font-size:20px;background-color: rgba(102, 0, 0, .35);color:white;" value ="Counts : "/>
+											</td>
+										</tr>
+										<tr>
+											<td style="text-align:left;">
+												<img src="static/Fraud.png" class="navbar-brand-image d-inline-block align-top mr-2 " alt=""><input type="text"  id="train_event_count" style="font-size:20px;background-color: rgba(102, 0, 0, .35);color:white;" value ="Events : "/>
+											</td>
+											<td style="text-align:left;">
+												<img src="static/Fraud.png" class="navbar-brand-image d-inline-block align-top mr-2 " alt=""><input type="text"  id="test_event_count" style="font-size:20px;background-color: rgba(102, 0, 0, .35);color:white;" value ="Events : "/>
+											</td >
+										</tr>
+										<tr>
+											<td style="text-align:left;">
+												<img src="static/percent.png" class="navbar-brand-image d-inline-block align-top mr-2 " alt=""><input type="text"  id="train_event_rate" style="font-size:20px;background-color: rgba(102, 0, 0, .35);color:white;" value ="Event Rate : "/>
+											</td>
+											<td style="text-align:left;">
+												<img src="static/percent.png" class="navbar-brand-image d-inline-block align-top mr-2 " alt=""><input type="text"  id="test_event_rate" style="font-size:20px;background-color: rgba(102, 0, 0, .35);color:white;" value ="Event Rate : "/>
+											</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+						  </div>
+						</div>
+					</div>
+				</div>
+
+							
+		</div>
+		
+		<div class="row" id="output_row_tables" style="display:none" >
+			<div class="col-lg-12 d-flex">
+				<div class="card mb-grid w-100" style="background-color: rgba(0, 0, 102, .35);">
+					<div class="card-body d-flex flex-column">					
+						<div class="card">
+							<div class="card-header d-flex justify-content-between align-items-center" style="background-color: rgb(0, 0, 102);">
+								<div class="card-header-title"><font color='white'>Sample Data</font></div>
+							</div>
+						  
+						  <div class="card-body collapse show" id="card1" style="height:600px;overflow-y:auto; overflow-x:auto" >
+								<table id="sample_data_table" style="background-color:white" class="table table-actions table-bordered table-hover mb-0" >
+								</table>
+						  </div>
+						</div>
+					</div>
+				</div>
+			</div>
+					  
+		</div>
+			
+		</div>
+
+	{% endblock content %}
+
+{% block my_scripts %}	
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/uploadr.js') }}"></script>
+<script>
+
+var global_train_file_name ="";
+var global_test_file_name ="";
+
+function updateTestTrain(){
+	train = $('#myRange').val();
+	$('#train_value').html(train);
+	$('#test_value').html(100 - train);
+}
+
+function generateTestTrainSplit(){
+
+	filename = ""
+	
+	if( $('input[id="fileNameHidden"]').val() != null)
+	{
+		filename = $('input[id="fileNameHidden"]').val();
+	}
+
+	train = $('#train_value').html();
+	train_test_split = (100 - train)/100
+	$('#output_row_tables').hide();
+	$('#summary_details').hide();
+	$('#target_variable').hide();
+	
+	$.getJSON('/trainTestSplit', 
+			  {
+				train_test_split  : train_test_split,
+				filename : filename
+			  }, function(data) {
+					
+					
+					if(data.error=='none')
+					{
+						console.log("calling get File Info");
+						
+						
+						global_train_file_name = data.train_name;
+						global_test_file_name = data.test_name;
+						getFileData(data.train_name, data.test_name);
+						getColumns(data.train_name);
+						
+					}
+					else if (data.error=='error')
+					{
+						console.log("error encountered");
+					}
+		});
+
+			
+	
+	
+}
+function getFileData(train_name, test_name) {
+
+ $.getJSON('/getFileInfo', 
+			  {
+				train_file_name: train_name,
+				test_file_name: test_name,
+			  }, function(data2) {
+					
+					
+					if(data2.error=='none')
+					{
+						$('#output_row_tables').show();
+						$('#output_row_tables').css({'display':'-webkit-box','display':'-ms-flexbox','display':'flex'})
+						
+						$('#sample_data_table').empty();
+						$('#sample_data_table').append('<tr>');
+						$.each(data2.sample_data[0], function(k, v) {
+							$('#sample_data_table').append( '<th>' + k + ' </th>');
+						});		
+
+						$.each(data2.sample_data, function(k, v) {
+							$('#sample_data_table').append( '<tr>');
+							$.each(v, function(k1, v1) {
+								$('#sample_data_table').append( '<td>' + v1 + ' </td>');
+							});
+						});
+						
+						
+						
+						
+					}
+					else
+					{
+						console.log("error")
+					}
+			  });						
+
+}
+
+
+function getColumns(filename){
+
+	if (filename ==''){
+		return ;
+	}
+	
+	$.getJSON('/getColumnNames', 
+	 {
+		filename: filename,
+	  }, function(data) {
+			if(data.error=='none')
+			{
+				$('#target_field').append( new Option ('Select', 'Select',false, false));
+				
+				for (var i=0, len=data.all_columns.length; i<len;i++) {
+				
+				$('#target_field').append( new Option (data.all_columns[i], data.all_columns[i],false, false));
+				}
+
+				$('#target_variable').show();
+			}
+			else
+			{
+				console.log("error");
+			}
+	  }
+	  );
+
+}		
+
+function getSummary(){
+
+	target =$('#target_field').val();
+
+	$.getJSON('/getTargetEventRate', 
+	 {
+		train_file_name: global_train_file_name,
+		test_file_name : global_test_file_name,
+		target : target,
+	  }, function(data) {
+			if(data.error=='none')
+			{
+				console.log(data);
+				
+						$('#train_event_count').val("Events : " + data.train_event_yes);
+						$('#test_event_count').val("Events : " + data.test_event_yes);
+						$('#train_event_rate').val("Event Rate : " + data.train_event_rate);
+						$('#test_event_rate').val("Event Rate : " + data.test_event_rate);
+						$('#summary_details').show();
+						var text= "Counts : " + data.no_of_train;
+						$('#train_count').val(text);
+						text = "Counts : " + data.no_of_test;
+						$('#test_count').val(text);
+						
+					
+			}
+			else
+			{
+				console.log("error");
+			}
+	  }
+	  );	
+
+}		
+
+function selectAll(){
+
+	var aa= document.getElementsByTagName("input");
+	for (var i =0; i < aa.length; i++){
+		if (aa[i].type == 'checkbox' && aa[i].id != 'deSelectAll')
+			aa[i].checked = true;
+	}
+
+	$('#deSelectAll').removeAttr("disabled");
+}
+function deSelectAll(){
+
+	var aa= document.getElementsByTagName("input");
+	for (var i =0; i < aa.length; i++){
+		if (aa[i].type == 'checkbox')
+			aa[i].checked = false;
+	}
+	$('#deSelectAll').attr("disabled", true);
+}
+
+function enableDeSelectCheckBox(){
+	$('#deSelectAll').removeAttr("disabled");
+}
+
+function createBalancedData(){
+	values =''
+	target =$('#target_field').val();
+	$('#event_rate_balancing').find(':checkbox').each(function(){
+		
+		if  (this.checked == true){
+		
+			if (values == '' ){
+					values =  this.value + "|";
+			}else{
+				values = values + this.value + "|" ;
+			}
+		}
+	});
+	if (values ==''){
+		alert("Please select at least one method to proceed" );
+		return false;
+	}
+	else{
+		console.log(values);
+	}
+
+var notification=new window.notifications;
+
+$.getJSON('/createBalancedData', 
+	  {
+		methods: values,
+		target :target ,
+		filename : global_train_file_name
+	  }, function(data) {
+			
+			console.log("Inside jquery to print information");
+			
+			if(data.error=='none')
+			{
+				console.log(" No error while Text Scoring Methods");
+				
+				notification.fire('Sucessfully create balanced data files ', {
+				  autoHide: true,
+				  playSound: true,
+				  duration: 5000,
+				  style: 'Success',
+				});
+				$('#s_response').show();
+				$('#general_info').hide();
+			}
+			else
+			{
+				notification.fire('Error while creating balanced data files ', {
+				  autoHide: true,
+				  playSound: true,
+				  duration: 5000,
+				  style: 'Danger',
+				});
+				console.log("error while Text Scoring Methods");
+				$('#f_response').show();
+				$('#general_info').hide();
+			}
+});		
+
+}
+
+</script>
+{% endblock my_scripts %}

@@ -1,0 +1,253 @@
+{% extends "layout.html" %}
+
+	{% block content %}
+
+		<div class="adminx-main-content" >
+					
+			<div class="row" id="inputrow">
+				<div class="col-lg-6">
+					<div class="card mb-grid">
+						<div class="card-header" style="background-color:#5397d3">
+							<div class="card-header-title" ><font color='white'>Select Comparison Parameters</font></div>
+						</div>
+						<div class="card-body" style="background-color:#9acfff">
+						
+							<div class="form-group row">
+								<label for="file_selected" class="col-sm-4 col-form-label form-label">Select Data</label>
+								<div class="col-sm-8">
+									<select name="files" onchange= "enableSubmitButton();" id="file_selected" class="form-control js-example-basic-single">
+									<option> </option>
+										{% for filename in file_names %}
+											<option value= "{{filename }}" > {{filename }} </option>
+										{% endfor %}
+									</select>								  
+								</div>								
+							</div>
+						
+							<div class="form-group row">
+								<label for="model_list" class="col-sm-4 col-form-label form-label">Model</label>
+								
+								<div class="col-sm-8">
+									<select name="model_list_to_select" onchange="enableSubmitButton();" id="model_list" class="form-control js-example-basic-single">
+										<option> </option>
+										<option> All </option>
+										{% for m in model_list %}
+											<option value= "{{m}}" > {{m}} </option>
+										{% endfor %}
+									</select>											
+								</div>								
+							</div>												
+
+							<div class="form-group row">
+								<label for="model_run_type" class="col-sm-4 col-form-label form-label">Model Run</label>
+								<div class="col-sm-8">
+									<select name="model_run_type" onchange="enableSubmitButton();" id="model_run_type" class="form-control js-example-basic-single">
+									<option> </option>
+										{% for model_run in model_run_type %}
+											<option value= "{{model_run }}" > {{model_run }} </option>
+										{% endfor %}
+									</select>								  
+								</div>								
+							</div>	
+							<div class="form-group row">
+								<label for="model_list" class="col-sm-4 col-form-label form-label">Detection Rate</label>
+								
+								<div class="col-sm-8">
+									<select name="model_list_to_select" onchange="enableSubmitButton();" id="detection_rate" class="form-control js-example-basic-single">
+										
+										{% for m in detection_list %}
+											<option value= "{{m}}" > {{m}} </option>
+										{% endfor %}
+									</select>											
+								</div>								
+							</div>	
+							<div class="form-group row">
+								<label for="submit_button" class="col-sm-4 col-form-label form-label"></label>
+								<div class="col-sm-8">
+									<button type="submit" class="btn btn-sm btn-primary" disabled id = "submit_button">Submit</button>								  
+								</div>								
+							</div>	
+
+						</div>
+					</div>
+				</div>
+
+			</div>
+					
+			
+			
+			<div class="row" id="output_row_tables" style="display:none">
+			    <div class="col-lg-12 ">
+					<div class="card mb-grid" style="background-color: rgba(0, 102, 0, .35);" >
+						<div class="card-body d-flex flex-column">					
+							<div class="card" >
+								<div class="card-header d-flex justify-content-between align-items-center" style="background-color: rgb(0, 102, 0);" >
+									<div class="card-header-title"><font color='white'>Model Metrics</font></div>
+								</div>
+							  
+							  <div class="card-body collapse show" id="card1" style="height:750px;overflow-y:auto; overflow-x:auto">
+									<table id="model_output_table" class="table table-actions table-bordered table-hover mb-0" >
+									</table>
+							  </div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+
+	{% endblock content %}
+
+	{% block popup_divs %}
+		
+	{% endblock popup_divs %}
+	
+
+	{% block my_scripts %}
+
+
+	<script type=text/javascript>
+		  $(function() 
+		  {
+			$('#submit_button').bind('click', function() 
+			{
+				console.log(" Button Clicked ");
+				$.getJSON('/get_model_comparison', 
+				{				
+					model : $('select[name="model_list_to_select"]').val(),
+					model_run_type: $('select[id="model_run_type"]').val(),
+					filename : $('#file_selected').val(),
+					detection_rate :$('#detection_rate').val(),					
+				}, function(data) {
+				
+				
+					if (data.error == 'error'){
+						var notification=new window.notifications;
+						notification.fire('No results saved , please run model first', {
+						  autoHide: true,
+						  playSound: true,
+						  duration: 5000,
+						  style: 'Danger',
+						});
+						
+						return;
+						
+					}
+			
+					$('#output_row_tables').css({'display':'-webkit-box','display':'-ms-flexbox','display':'flex'})
+						$('#model_output_table').empty();
+						$('#model_output_table').append('<tr>');
+						$('#model_output_table').append('<th>Model</th>');
+						$('#model_output_table').append('<th>Train File</th>');												
+						$('#model_output_table').append('<th>Test File</th>');												
+						$('#model_output_table').append('<th>Model Parameters</th>');
+						$('#model_output_table').append('<th>Model Run Datetime</th>');
+						$('#model_output_table').append('<th>Model Execution Duration (seconds)</th>');
+						$('#model_output_table').append('<th>False Positive Ratio</th>');
+						$('#model_output_table').append('<th>Confusion Matrix</th>');
+						$('#model_output_table').append('<th>AUC</th>');
+						$('#model_output_table').append('<th>Total Observation</th>');
+						$('#model_output_table').append('<th>True Negative</th>');
+						$('#model_output_table').append('<th>True Positive</th>');
+						$('#model_output_table').append('<th>False Positive</th>');
+						$('#model_output_table').append('<th>False Negative</th>');
+						$('#model_output_table').append('<th>% ML predicted</th>');
+						$('#model_output_table').append('<th>Sensitivity</th>');
+						$('#model_output_table').append('<th>Specificity</th>');
+						$('#model_output_table').append('<th>Precision</th>');
+						$('#model_output_table').append('<th>Accuracy</th>');
+						$('#model_output_table').append('<th>G measure</th>');
+						$('#model_output_table').append('<th>F score</th>');
+						
+						
+						$('#model_output_table').append('</tr>');
+						console.log("Inside Print");
+						console.log(data);				
+						console.log(data.results.length);
+						
+						for (var i=0, len=data.results.length; i<len;i++) 
+						{
+								$('#model_output_table').append('<tr>');
+								$('#model_output_table').append('<td>' + data.results[i]['model_used'] + '</td>');
+								$('#model_output_table').append('<td >' + data.results[i]['train_file'] + '</td>');
+								$('#model_output_table').append('<td >' + data.results[i]['test_file'] + '</td>');
+								$('#model_output_table').append('<td>' + data.results[i]['model_parameter_text'] + '</td>');
+								$('#model_output_table').append('<td>' + data.results[i]['model_result']['run_datetime']+ '</td>');
+								$('#model_output_table').append('<td>' + data.results[i]['model_result']['time_taken']+ '</td>');
+								$('#model_output_table').append('<td>' + data.results[i]['model_result']['false_positive_ratio']+ '</td>');
+								$('#model_output_table').append('<td><a href=/' + data.results[i]['confusion_matrix_plot']+ '>' + 'Matrix</a></td>');
+								
+								$('#model_output_table').append('<td>' + data.results[i]['model_result']['roc_auc']+ '</td>')
+								$('#model_output_table').append('<td>' + data.results[i]['model_result']['total_observation'] + '</td>');
+								$('#model_output_table').append('<td>' + data.results[i]['model_result']['true_negative'] + '</td>');
+								$('#model_output_table').append('<td>' + data.results[i]['model_result']['true_positive'] + '</td>');
+								$('#model_output_table').append('<td >' + data.results[i]['model_result']['false_positive'] + '</td>');
+								$('#model_output_table').append('<td >' + data.results[i]['model_result']['false_negative'] + '</td>');
+								$('#model_output_table').append('<td >' + data.results[i]['model_result']['predicted_ml'] + '</td>');
+								$('#model_output_table').append('<td >' + data.results[i]['model_result']['sensitivity'] + '</td>');
+								$('#model_output_table').append('<td >' + data.results[i]['model_result']['specificity'] + '</td>');
+								$('#model_output_table').append('<td >' + data.results[i]['model_result']['precision'] + '</td>');
+								$('#model_output_table').append('<td >' + data.results[i]['model_result']['accuracy'] + '</td>');
+								$('#model_output_table').append('<td >' + data.results[i]['model_result']['g_measure'] + '</td>');
+								$('#model_output_table').append('<td >' + data.results[i]['model_result']['f_score'] + '</td>');
+								
+								
+								
+						}
+			  });
+			  return false;
+			  
+			}
+			);
+		  });
+	</script>
+
+<script>
+	$(document).ready(function () {
+		$('#model_list').select2({
+			placeholder: "Select Model",
+			allowClear: true
+		});
+		});
+
+	$(document).ready(function () {
+		$('#model_run_type').select2({
+			placeholder: "Select Comparison Type",
+			allowClear: true
+		});
+		});
+		
+
+	$(document).ready(function () {
+		$('#file_selected').select2({
+			placeholder: "Select File",
+			allowClear: true
+		});
+		});		
+	model = $('select[name="model_list_to_select"]').val();
+	model_run_type = $('select[id="model_run_type"]').val();
+	f = $('#file_selected').val();
+	if ( model_run_type != '' && model_run_type !=''  && f !=''){
+		$('#submit_button').attr("disabled", false);
+		console.log(" Enabling the Button on load - after coming from Confusion matrix");
+		$('#submit_button').click();
+	}
+
+	
+
+function enableSubmitButton(){
+
+	model = $('select[name="model_list_to_select"]').val();
+	model_run_type = $('select[id="model_run_type"]').val();
+	f = $('#file_selected').val();
+	if ( model_run_type != '' && model_run_type !=''  && f !='' ){
+		$('#submit_button').attr("disabled", false);
+	}
+
+
+}
+		
+</script>
+	
+	{% endblock my_scripts %}	

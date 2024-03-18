@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">  
+	  
+		<title> Transaction Monitoring</title>
+		
+		<link rel="stylesheet" type="text/css" href="static/styles/adminx.css" media="screen" />
+		<link rel="stylesheet" href="static/styles/healthcare_styles.css">
+		<link rel="stylesheet" href="static/styles/slider.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" />
+		<link href="http://hayageek.github.io/jQuery-Upload-File/4.0.11/uploadfile.css" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  </head>
+  <body>
+  
+  <div class="adminx-container">
+	<nav class="navbar navbar-expand justify-content-between fixed-top"  style="background-color:black">
+		<a class="navbar-brand mb-0 h1 d-none d-md-block href="index.html">
+		  <font color='white'>Transaction Monitoring</font>
+		</a>
+
+		<div class="d-flex flex-1 d-block d-md-none">
+		  <a href="#" >
+			<i data-feather="menu"></i>
+		  </a>
+		</div>
+	</nav> 
+  
+        <!-- expand-hover push -->
+      <!-- Sidebar -->
+      <div class="adminx-sidebar expand-hover push" style="background-color:black">
+        <ul class="sidebar-nav">
+         
+		  
+          <li class="sidebar-nav-item">
+            <a href="/upload_data" class="sidebar-nav-link" >
+              <span class="sidebar-nav-icon" style="color:white">
+                <i data-feather="file-text"></i>
+              </span>
+              <span class="sidebar-nav-name" style="color:white">
+                Upload New Data
+              </span>
+            </a>
+          </li>		  
+          <li class="sidebar-nav-item">
+            <a href="/InformationValue" class="sidebar-nav-link" >
+              <span class="sidebar-nav-icon" style="color:white">
+                <i data-feather="thermometer"></i>
+              </span>
+              <span class="sidebar-nav-name" style="color:white">
+                Information Value
+              </span>
+            </a>
+          </li>	
+		  
+          <li class="sidebar-nav-item">
+            <a href="/univariate" class="sidebar-nav-link" >
+              <span class="sidebar-nav-icon" style="color:white">
+                <i data-feather="align-justify"></i>
+              </span>
+              <span class="sidebar-nav-name" style="color:white">
+                Data Analysis
+              </span>
+            </a>
+          </li>
+		  
+		  
+          <li class="sidebar-nav-item">
+            <a href="/modelSelection" class="sidebar-nav-link" >
+              <span class="sidebar-nav-icon" style="color:white">
+                <i data-feather="edit"></i>
+              </span>
+              <span class="sidebar-nav-name" style="color:white">
+                Model Development
+              </span>
+            </a>
+          </li>
+		  
+          <li class="sidebar-nav-item">
+            <a href="/compareModels" class="sidebar-nav-link" >
+              <span class="sidebar-nav-icon" style="color:white">
+                <i data-feather="grid"></i>
+              </span>
+              <span class="sidebar-nav-name" style="color:white">
+                Model Comparison
+              </span>
+            </a>
+          </li>		  		  
+		  
+		  
+        </ul>
+      </div><!-- Sidebar End -->
+  
+	
+  
+	<div class="adminx-content">
+	
+	{% block content %}
+	{% endblock content%}
+
+	</div>
+  </div>
+
+  <!-- MODALS START -->
+	<div class="modal" id="model_spin"> 
+	</div>
+
+	{% block popup_divs %}
+	{% endblock popup_divs %}
+	
+   <!-- MODALS END -->
+   
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- If you prefer jQuery these are the required scripts -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+    <script src="static/js/vendor.js"></script>
+    <script src="static/js/adminx.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+	<script>
+		$(document).ready(function() {
+			$('.js-example-basic-single').select2();
+		});
+
+		$(document).ready(function() {
+			$('.js-example-basic-multiple').select2();
+		});				
+	</script>	
+	
+	<script>
+		$body = $("body");
+
+		$(document).on({
+			ajaxStart: function() { console.log("Starting"); $body.addClass("loading");    },
+			 ajaxStop: function() { console.log("Ending"); $body.removeClass("loading"); }    
+		});
+	</script>
+
+	{% block my_scripts %}
+	{% endblock my_scripts %}
+	
+
+  </body>
+</html>

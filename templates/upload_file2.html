@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+
+	{% block content %}
+		<div class="adminx-main-content">
+            <!--<nav aria-label="breadcrumb" role="navigation">
+              <ol class="breadcrumb adminx-page-breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Data Facts</li>
+              </ol>
+            </nav>-->
+					
+			<div class="row" id="inputrow">
+				<div class="col-lg-6">
+					<div class="card mb-grid">
+						<div class="card-header">
+							<div class="card-header-title">New Dataset</div>
+						</div>
+						<div class="card-body">
+							<form method="POST" enctype="multipart/form-data" id="upload_form" action="{{ url_for('upload') }}">
+								<div class="form-group row">
+									<label for="model_list" class="col-sm-4 col-form-label form-label">Select File</label>
+									<div class="col-sm-8">
+										<input class="btn" id="file-picker" type="file" name="file">
+										    <fieldset id="progress" style="display: none">
+												<legend>Files Progress</legend>
+
+												<div class="progress-trough">
+													<div id="progress-bar" class="progress-bar">0%</div>
+												</div>
+											</fieldset><p>
+											
+										<input type="submit" value = "Upload" class="btn btn-primary" id = "upload-button">
+										
+									</div>							
+								</div>
+							</form>
+				
+						</div>
+					</div>
+				</div>
+			</div>
+	
+		</div>
+
+	{% endblock content %}
+
+{% block my_scripts %}	
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/uploadr.js') }}"></script>
+
+<script>
+$(document).ready(function()
+{
+	$("#fileuploader").uploadFile({
+	url:"YOUR_FILE_UPLOAD_URL",
+	fileName:"myfile"
+	});
+});
+</script>
+{% endblock my_scripts %}
